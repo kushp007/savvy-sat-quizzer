@@ -38,25 +38,27 @@ const Index = () => {
           <div className="flex justify-center items-center gap-3 mb-4">
             <Brain className="w-10 h-10 text-indigo-600" />
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
-              SAT Math Quiz
+            Savvy SAT Quizzer
             </h1>
           </div>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Test your SAT Math skills with AI-generated questions that adapt to your performance level
+            Sharpen your SAT Math skills with adaptive quizzes, real-time feedback, and AI-powered question expansion.
           </p>
         </div>
 
         {/* Features Grid */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
-          <Card className="text-center hover:shadow-lg transition-shadow duration-300">
+          <Card className="text-center hover:scale-105 hover:shadow-lg transition duration-300 ease-in-out">
             <CardContent className="pt-6">
               <BookOpen className="w-12 h-12 text-indigo-500 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">AI-Generated Questions</h3>
-              <p className="text-gray-600">Fresh questions powered by advanced AI technology</p>
+              <h3 className="text-xl font-semibold mb-2">Hybrid question pool</h3>
+              <p className="text-gray-600">
+                Built-in problems plus optional server-generated batches — keys never ship to the browser
+              </p>
             </CardContent>
           </Card>
           
-          <Card className="text-center hover:shadow-lg transition-shadow duration-300">
+          <Card className="text-center hover:scale-105 hover:shadow-lg transition duration-300 ease-in-out">
             <CardContent className="pt-6">
               <Target className="w-12 h-12 text-purple-500 mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">Adaptive Difficulty</h3>
@@ -64,7 +66,7 @@ const Index = () => {
             </CardContent>
           </Card>
           
-          <Card className="text-center hover:shadow-lg transition-shadow duration-300">
+          <Card className="text-center hover:scale-105 hover:shadow-lg transition duration-300 ease-in-out">
             <CardContent className="pt-6">
               <Trophy className="w-12 h-12 text-amber-500 mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">Real-time Scoring</h3>
@@ -111,7 +113,7 @@ const Index = () => {
 
         {/* Footer */}
         <div className="text-center mt-12 text-gray-500">
-          <p>Good luck! Remember, the questions will adapt to challenge you appropriately.</p>
+          <p>Good luck! Difficulty mix shifts based on your rolling accuracy.</p>
         </div>
       </div>
     </div>
