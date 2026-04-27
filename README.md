@@ -6,7 +6,6 @@ An **AI-powered adaptive SAT Math practice platform** that simulates real exam c
 
 ## 🌐 Live Demo
 
-*(Add your deployed link here once live)*
 👉 https://your-app-link.vercel.app
 
 ---
@@ -14,132 +13,68 @@ An **AI-powered adaptive SAT Math practice platform** that simulates real exam c
 ## ✨ Features
 
 ### 🎯 Smart Quiz Engine
-
-* 25-question SAT-style timed quiz (25 minutes)
-* Multiple-choice questions with **instant feedback**
-* Detailed **explanations** for every question
-* **No repetition** within a full cycle of questions
-
----
+- 25-question SAT-style timed quiz (25 minutes)
+- Multiple-choice questions with **instant feedback**
+- Detailed **explanations** for every question
+- **No repetition** within a full cycle of questions
 
 ### 🤖 AI-Powered Question Generation
-
-* Dynamically generates SAT-style questions using OpenAI
-* Runs securely on backend (**API key never exposed**)
-* Merges with local question bank
-* Deduplicates and validates generated questions
-
----
+- Dynamically generates SAT-style questions using OpenAI
+- Runs securely on backend (**API key never exposed**)
+- Merges with local question bank
+- Deduplicates and validates generated questions
 
 ### 🧠 Adaptive Difficulty System
-
-* Adjusts question difficulty based on performance
-* Strong performance → harder questions
-* Weak performance → easier questions
-* Ensures balanced topic distribution
-
----
+- Adjusts question difficulty based on performance
+- Strong performance → harder questions
+- Weak performance → easier questions
+- Ensures balanced topic distribution
 
 ### 📊 Performance Analytics
+- Real-time score tracking
+- Accuracy percentage
+- Question-by-question review
+- Visual feedback for correct/incorrect answers
 
-* Real-time score tracking
-* Accuracy percentage
-* Question-by-question review
-* Visual feedback for correct/incorrect answers
-
----
-
-### 🧠 AI Performance Feedback (🔥 Key Feature)
-
-* Identifies **weak topics** and **strong areas**
-* Provides **personalized improvement suggestions**
-* Helps users focus on what matters most
-
----
+### 🔥 AI Performance Feedback
+- Identifies **weak topics** and **strong areas**
+- Provides **personalized improvement suggestions**
+- Helps users focus on what matters most
 
 ### 🔄 Hybrid Question System
-
-* Works offline with local question bank
-* Expands dynamically with AI when available
-* Graceful fallback if API is unavailable
+- Works offline with local question bank
+- Expands dynamically with AI when available
+- Graceful fallback if API is unavailable
 
 ---
 
 ## 🛠 Tech Stack
 
-| Layer              | Technology                                    |
-| ------------------ | --------------------------------------------- |
-| Frontend           | React 18, TypeScript, Tailwind CSS, shadcn/ui |
-| Build Tool         | Vite                                          |
-| State Management   | Custom React Hooks                            |
-| Backend            | Node.js, Express                              |
-| AI Integration     | OpenAI API (server-side only)                 |
-| Database (planned) | MongoDB (scaffold included)                   |
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, TypeScript, Tailwind CSS, shadcn/ui |
+| Build Tool | Vite |
+| State Management | Custom React Hooks |
+| Backend | Node.js, Express |
+| AI Integration | OpenAI API (server-side only) |
+| Database (planned) | MongoDB (scaffold included) |
 
 ---
 
 ## ⚙️ How It Works
 
-### 1. Question Sources
-
-* Local questions from:
-
-  ```
-  src/data/questions.ts
-  ```
-* AI-generated questions via:
-
-  ```
-  POST /api/generate-questions
-  ```
-
----
-
-### 2. Hybrid Pool Creation
-
-* Local + AI questions are merged
-* Deduplicated using:
-
-  * normalized text
-  * topic
-  * difficulty
-
----
-
-### 3. Adaptive Selection
-
-* Questions served **without repetition**
-* Difficulty adjusts based on recent performance
-* Maintains topic diversity
-
----
-
-### 4. AI Feedback Engine
-
-After quiz completion:
-
-* Analyzes user performance
-* Detects weak areas
-* Generates personalized study suggestions
-
----
-
-## 🔐 Security
-
-* OpenAI API key is stored in `.env`
-* Never exposed to frontend
-* All AI requests handled via backend
+1. **Question Sources** — Local questions from `src/data/questions.ts` + AI-generated questions via `POST /api/generate-questions`
+2. **Hybrid Pool Creation** — Local and AI questions are merged and deduplicated by normalized text, topic, and difficulty
+3. **Adaptive Selection** — Questions served without repetition; difficulty adjusts based on recent performance while maintaining topic diversity
+4. **AI Feedback Engine** — After quiz completion, analyzes performance, detects weak areas, and generates personalized study suggestions
 
 ---
 
 ## 🚀 Getting Started
 
 ### Requirements
-
-* Node.js 18+
-* npm
-
----
+- Node.js 18+
+- npm
 
 ### Installation
 
@@ -147,21 +82,17 @@ After quiz completion:
 npm install
 ```
 
----
-
 ### Run (Frontend only)
 
 ```bash
 npm run dev
 ```
 
-👉 Uses only local questions
-
----
+> Uses only local questions — no API key needed.
 
 ### Run (Full App with AI)
 
-1. Create a `.env` file:
+1. Create a `.env` file in the project root:
 
 ```env
 OPENAI_API_KEY=your_api_key_here
@@ -174,8 +105,6 @@ PORT=3001
 ```bash
 npm run dev:full
 ```
-
----
 
 ### Build for Production
 
@@ -190,60 +119,51 @@ npm run preview
 
 ```
 src/
-  ├── components/        # UI components
-  ├── data/              # Local question bank
-  ├── hooks/             # Custom hooks (quiz logic)
-  ├── services/          # API + hybrid system
-  ├── types/             # TypeScript types
-  ├── utils/             # Helper functions
-  ├── pages/             # App pages
+├── components/     # UI components
+├── data/           # Local question bank
+├── hooks/          # Custom hooks (quiz logic)
+├── services/       # API + hybrid system
+├── types/          # TypeScript types
+├── utils/          # Helper functions
+└── pages/          # App pages
 
 server/
-  ├── index.js           # Express API
-  ├── db/                # MongoDB scaffold
+├── index.js        # Express API
+└── db/             # MongoDB scaffold
 
 public/
-  ├── favicon.jpg
-  ├── assets
+├── favicon.jpg
+└── assets/
 
-.env                     # Environment variables
+.env                # Environment variables (never commit this)
 ```
 
 ---
 
-## 🔮 Future Improvements
+## 🔐 Security
 
-* 📊 Persistent user data with MongoDB
-* 🎯 Topic-based practice mode
-* 📈 Advanced analytics dashboard
-* 🌙 Dark mode
-* 📱 Mobile optimization
-* 🧠 Smarter AI validation pipeline
+- OpenAI API key stored in `.env` — never committed or exposed to the frontend
+- All AI requests proxied through the backend server
 
 ---
 
-## 📸 Screenshots
+## 🔮 Roadmap
 
-*(Add screenshots here later for better presentation)*
+- [ ] Persistent user data with MongoDB
+- [ ] Topic-based practice mode
+- [ ] Advanced analytics dashboard
+- [ ] Dark mode
+- [ ] Mobile optimization
+- [ ] Smarter AI validation pipeline
 
 ---
 
 ## 👨‍💻 Author
 
-**Kush Prajapati**
-Computer Science @ UCR
-
----
-
-## 🏆 Highlights
-
-* AI-integrated full-stack application
-* Adaptive learning algorithm
-* Secure backend architecture
-* Modern UI with Tailwind + React
+**Kush Prajapati** — Computer Science @ UCR
 
 ---
 
 ## 📄 License
 
-For portfolio and educational use.
+For portfolio and educational use only.
