@@ -1,109 +1,249 @@
-# Savvy SAT Quizzer
+# 🧠 Savvy SAT Quizzer
 
-An SAT Math practice quiz built with **React**, **TypeScript**, **Vite**, **Tailwind CSS**, and **shadcn/ui**. It ships with a **local question bank**, merges in **optional AI-generated batches** from a tiny **Express** backend (OpenAI runs **only on the server**), and uses a **simple adaptive difficulty** mix based on your rolling accuracy.
+An **AI-powered adaptive SAT Math practice platform** that simulates real exam conditions while providing **personalized feedback, intelligent question generation, and performance insights**.
 
-## What it does
+---
 
-- Collects the learner’s **name** on a start screen, then runs a **25-question** timed session (25 minutes).
-- Serves **multiple-choice** questions with **immediate feedback**, **explanations**, and a **results** screen with per-question review.
-- Builds a **hybrid pool**: offline-safe local items in `src/data/questions.ts`, plus optional **deduplicated** AI questions when the API is available.
-- **No repeats** within a full pass through the pool: used questions are tracked until every item has appeared once, then the cycle resets with a fresh shuffle.
+## 🌐 Live Demo
 
-## Tech stack
+*(Add your deployed link here once live)*
+👉 https://your-app-link.vercel.app
 
-| Layer | Choice |
-|--------|--------|
-| UI | React 18, Tailwind, shadcn/ui |
-| Build | Vite 5, TypeScript |
-| State | React hooks (`useQuiz`) |
-| API | Express (`server/index.js`) |
-| AI | OpenAI Chat Completions (JSON), **server-side only** |
-| DB | Not wired yet — see `server/db/mongoScaffold.js` |
+---
 
-## How questions work
+## ✨ Features
 
-1. **Local bank** — `src/data/questions.ts` is the offline source of truth (30 items).
-2. **On quiz start**, the client calls `POST /api/generate-questions` (proxied in dev). If the server or key is missing, the app **continues with local questions only** and shows a notice.
-3. **Merge + dedupe** — AI rows are merged with locals using normalized text + topic + difficulty (`src/utils/questionUtils.ts`).
-4. **Adaptive selection** — the next question is chosen **without replacement** within a cycle, with **weights** favoring harder items when accuracy is high and easier items when it is low.
+### 🎯 Smart Quiz Engine
 
-## Security: API keys
+* 25-question SAT-style timed quiz (25 minutes)
+* Multiple-choice questions with **instant feedback**
+* Detailed **explanations** for every question
+* **No repetition** within a full cycle of questions
 
-- **Do not** put `OPENAI_API_KEY` in frontend code or `VITE_*` variables that embed secrets in the bundle.
-- Put the key in **`.env`** on the machine that runs `server/index.js` (see `.env.example`).
+---
 
-## Setup
+### 🤖 AI-Powered Question Generation
 
-**Requirements:** Node.js 18+ and npm.
+* Dynamically generates SAT-style questions using OpenAI
+* Runs securely on backend (**API key never exposed**)
+* Merges with local question bank
+* Deduplicates and validates generated questions
+
+---
+
+### 🧠 Adaptive Difficulty System
+
+* Adjusts question difficulty based on performance
+* Strong performance → harder questions
+* Weak performance → easier questions
+* Ensures balanced topic distribution
+
+---
+
+### 📊 Performance Analytics
+
+* Real-time score tracking
+* Accuracy percentage
+* Question-by-question review
+* Visual feedback for correct/incorrect answers
+
+---
+
+### 🧠 AI Performance Feedback (🔥 Key Feature)
+
+* Identifies **weak topics** and **strong areas**
+* Provides **personalized improvement suggestions**
+* Helps users focus on what matters most
+
+---
+
+### 🔄 Hybrid Question System
+
+* Works offline with local question bank
+* Expands dynamically with AI when available
+* Graceful fallback if API is unavailable
+
+---
+
+## 🛠 Tech Stack
+
+| Layer              | Technology                                    |
+| ------------------ | --------------------------------------------- |
+| Frontend           | React 18, TypeScript, Tailwind CSS, shadcn/ui |
+| Build Tool         | Vite                                          |
+| State Management   | Custom React Hooks                            |
+| Backend            | Node.js, Express                              |
+| AI Integration     | OpenAI API (server-side only)                 |
+| Database (planned) | MongoDB (scaffold included)                   |
+
+---
+
+## ⚙️ How It Works
+
+### 1. Question Sources
+
+* Local questions from:
+
+  ```
+  src/data/questions.ts
+  ```
+* AI-generated questions via:
+
+  ```
+  POST /api/generate-questions
+  ```
+
+---
+
+### 2. Hybrid Pool Creation
+
+* Local + AI questions are merged
+* Deduplicated using:
+
+  * normalized text
+  * topic
+  * difficulty
+
+---
+
+### 3. Adaptive Selection
+
+* Questions served **without repetition**
+* Difficulty adjusts based on recent performance
+* Maintains topic diversity
+
+---
+
+### 4. AI Feedback Engine
+
+After quiz completion:
+
+* Analyzes user performance
+* Detects weak areas
+* Generates personalized study suggestions
+
+---
+
+## 🔐 Security
+
+* OpenAI API key is stored in `.env`
+* Never exposed to frontend
+* All AI requests handled via backend
+
+---
+
+## 🚀 Getting Started
+
+### Requirements
+
+* Node.js 18+
+* npm
+
+---
+
+### Installation
 
 ```bash
-cd savvy-sat-quizzer
 npm install
 ```
 
-### Run (UI only — local questions)
+---
+
+### Run (Frontend only)
 
 ```bash
 npm run dev
 ```
 
-Open the URL shown (default **http://localhost:8080**). AI expansion will be skipped unless the API is running.
+👉 Uses only local questions
 
-### Run (UI + API — hybrid pool with OpenAI)
+---
 
-1. Copy `.env.example` to `.env` and set `OPENAI_API_KEY`.
-2. Start both processes:
+### Run (Full App with AI)
+
+1. Create a `.env` file:
+
+```env
+OPENAI_API_KEY=your_api_key_here
+OPENAI_MODEL=gpt-4o-mini
+PORT=3001
+```
+
+2. Start both frontend and backend:
 
 ```bash
 npm run dev:full
 ```
 
-This runs Vite and the Express API (`server/index.js` on port **3001**). The Vite dev server **proxies** `/api` to that port.
+---
 
-### Build
+### Build for Production
 
 ```bash
 npm run build
 npm run preview
 ```
 
-For production, deploy the static build behind a host that also runs the Express API (or another backend) and set `VITE_QUIZ_API_URL` to the public API origin if it differs from the static site.
+---
 
-## Environment variables
+## 📁 Project Structure
 
-See `.env.example`. Summary:
+```
+src/
+  ├── components/        # UI components
+  ├── data/              # Local question bank
+  ├── hooks/             # Custom hooks (quiz logic)
+  ├── services/          # API + hybrid system
+  ├── types/             # TypeScript types
+  ├── utils/             # Helper functions
+  ├── pages/             # App pages
 
-| Variable | Purpose |
-|----------|---------|
-| `OPENAI_API_KEY` | Required on the **server** for AI batches |
-| `OPENAI_MODEL` | Optional model id (default `gpt-4o-mini`) |
-| `PORT` | API port (default `3001`) |
-| `VITE_QUIZ_API_URL` | Optional frontend base URL for the API in production |
+server/
+  ├── index.js           # Express API
+  ├── db/                # MongoDB scaffold
 
-## Project layout (quiz-related)
+public/
+  ├── favicon.jpg
+  ├── assets
 
-| Path | Role |
-|------|------|
-| `src/data/questions.ts` | Local question bank |
-| `src/types/question.ts` | Shared TypeScript types |
-| `src/utils/questionUtils.ts` | Shuffle, dedupe, adaptive weights |
-| `src/services/questionService.ts` | Hybrid pool loader + API call |
-| `src/hooks/useQuiz.ts` | Quiz session state |
-| `src/components/Quiz.tsx` | Quiz UI |
-| `src/components/QuizResults.tsx` | Results + explanations |
-| `server/index.js` | `/api/generate-questions`, `/api/health` |
-| `server/db/mongoScaffold.js` | Placeholder for MongoDB |
+.env                     # Environment variables
+```
 
-## Audit notes
+---
 
-Developer-oriented notes from the initial audit live in `src/lib/auditNotes.ts`.
+## 🔮 Future Improvements
 
-## Future improvements
+* 📊 Persistent user data with MongoDB
+* 🎯 Topic-based practice mode
+* 📈 Advanced analytics dashboard
+* 🌙 Dark mode
+* 📱 Mobile optimization
+* 🧠 Smarter AI validation pipeline
 
-- Persist users and scores in **MongoDB** using the scaffold in `server/db/mongoScaffold.js`.
-- Harden AI output (e.g. re-validate math, filter broken items).
-- Add topic filters and exam-style section timing presets.
+---
 
-## License
+## 📸 Screenshots
 
-Private / portfolio use — adjust as needed for your repository.
+*(Add screenshots here later for better presentation)*
+
+---
+
+## 👨‍💻 Author
+
+**Kush Prajapati**
+Computer Science @ UCR
+
+---
+
+## 🏆 Highlights
+
+* AI-integrated full-stack application
+* Adaptive learning algorithm
+* Secure backend architecture
+* Modern UI with Tailwind + React
+
+---
+
+## 📄 License
+
+For portfolio and educational use.
