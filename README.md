@@ -1,54 +1,54 @@
-# 🧠 Savvy SAT Quizzer
+# Savvy SAT Quizzer
 
-An **AI-powered adaptive SAT Math practice platform** that simulates real exam conditions while providing **personalized feedback, intelligent question generation, and performance insights**.
-
----
-
-## 🌐 Live Demo
-
-👉 https://your-app-link.vercel.app
+An AI-powered adaptive SAT Math practice platform that simulates real exam conditions while providing personalized feedback, intelligent question generation, and performance insights.
 
 ---
 
-## ✨ Features
+## Live Demo
 
-### 🎯 Smart Quiz Engine
+https://your-app-link.vercel.app
+
+---
+
+## Features
+
+### Smart Quiz Engine
 - 25-question SAT-style timed quiz (25 minutes)
-- Multiple-choice questions with **instant feedback**
-- Detailed **explanations** for every question
-- **No repetition** within a full cycle of questions
+- Multiple-choice questions with instant feedback
+- Detailed explanations for every question
+- No repetition within a full cycle of questions
 
-### 🤖 AI-Powered Question Generation
+### AI-Powered Question Generation
 - Dynamically generates SAT-style questions using OpenAI
-- Runs securely on backend (**API key never exposed**)
+- Runs securely on backend (API key never exposed)
 - Merges with local question bank
 - Deduplicates and validates generated questions
 
-### 🧠 Adaptive Difficulty System
+### Adaptive Difficulty System
 - Adjusts question difficulty based on performance
 - Strong performance → harder questions
 - Weak performance → easier questions
 - Ensures balanced topic distribution
 
-### 📊 Performance Analytics
+### Performance Analytics
 - Real-time score tracking
 - Accuracy percentage
 - Question-by-question review
 - Visual feedback for correct/incorrect answers
 
-### 🔥 AI Performance Feedback
-- Identifies **weak topics** and **strong areas**
-- Provides **personalized improvement suggestions**
+### AI Performance Feedback
+- Identifies weak topics and strong areas
+- Provides personalized improvement suggestions
 - Helps users focus on what matters most
 
-### 🔄 Hybrid Question System
+### Hybrid Question System
 - Works offline with local question bank
 - Expands dynamically with AI when available
 - Graceful fallback if API is unavailable
 
 ---
 
-## 🛠 Tech Stack
+## Tech Stack
 
 | Layer | Technology |
 |---|---|
@@ -61,7 +61,7 @@ An **AI-powered adaptive SAT Math practice platform** that simulates real exam c
 
 ---
 
-## ⚙️ How It Works
+## How It Works
 
 1. **Question Sources** — Local questions from `src/data/questions.ts` + AI-generated questions via `POST /api/generate-questions`
 2. **Hybrid Pool Creation** — Local and AI questions are merged and deduplicated by normalized text, topic, and difficulty
@@ -70,7 +70,7 @@ An **AI-powered adaptive SAT Math practice platform** that simulates real exam c
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Requirements
 - Node.js 18+
@@ -115,7 +115,7 @@ npm run preview
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 src/
@@ -140,14 +140,14 @@ public/
 
 ---
 
-## 🔐 Security
+## Security
 
 - OpenAI API key stored in `.env` — never committed or exposed to the frontend
 - All AI requests proxied through the backend server
 
 ---
 
-## 🔮 Roadmap
+## Roadmap
 
 - [ ] Persistent user data with MongoDB
 - [ ] Topic-based practice mode
@@ -158,12 +158,12 @@ public/
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 **Kush Prajapati** — Computer Science @ UCR
 
 ---
 
-## 📄 License
+## License
 
 For portfolio and educational use only.
