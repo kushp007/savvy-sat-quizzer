@@ -28,6 +28,29 @@ const ResponseSchema = z.object({
   questions: z.array(QuestionSchema).min(1),
 });
 
+const FeedbackItemSchema = z.object({
+  topic: z.string().min(1),
+  subtopic: z.string().min(1),
+  difficulty: z.enum(["easy", "medium", "hard"]),
+  selected: z.number().int().min(0).max(3),
+  correct: z.number().int().min(0).max(3),
+  isCorrect: z.boolean(),
+});
+
+const FeedbackRequestSchema = z.object({
+  score: z.number().int().min(0),
+  totalQuestions: z.number().int().min(1),
+  percentage: z.number().min(0).max(100),
+  answers: z.array(FeedbackItemSchema).min(1),
+});
+
+const FeedbackResponseSchema = z.object({
+  summary: z.string().min(1),
+  weakAreas: z.array(z.string()).default([]),
+  strongAreas: z.array(z.string()).default([]),
+  studyTips: z.array(z.string()).default([]),
+});
+
 function normalizeCorrectAnswer(value) {
   if (typeof value === "number") return value;
   if (typeof value === "string") {
@@ -200,6 +223,86 @@ Requirements:
       error: "AI question batch failed. Using local question bank.",
       questions: [],
     });
+  }
+});
+
+app.post("/api/generate-feedback", async (req, res) => {
+  const parsedReq = FeedbackRequestSchema.safeParse(req.body);
+  if (!parsedReq.success) {
+    return res.status(400).json({ error: "Invalid feedback request payload." });
+  }
+
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    return res.status(503).json({ error: "OPENAI_API_KEY is not set." });
+  }
+
+  const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
+  const openai = new OpenAI({ apiKey });
+  const data = parsedReq.data;
+  const condensedAnswers = data.answers.map((a) => ({
+    topic: a.topic,
+    subtopic: a.subtopic,
+    difficulty: a.difficulty,
+    selected: a.selected,
+    correct: a.correct,
+    isCorrect: a.isCorrect,
+  }));
+
+  const prompt = `Analyze this SAT Math quiz performance and return concise JSON only.
+Return exactly this shape:
+{
+  "summary": "...",
+  "weakAreas": ["...", "..."],
+  "strongAreas": ["...", "..."],
+  "studyTips": ["...", "...", "..."]
+}
+
+Requirements:
+- Keep summary to 1-2 short sentences.
+- weakAreas: up to 3 topic/subtopic areas where the learner missed most.
+- strongAreas: up to 3 topic/subtopic areas where the learner performed best.
+- studyTips: 2-3 actionable SAT-focused tips.
+- Mention difficulty-level trend in the summary if useful.
+
+Quiz stats:
+${JSON.stringify(
+    {
+      score: data.score,
+      totalQuestions: data.totalQuestions,
+      percentage: data.percentage,
+      answers: condensedAnswers,
+    },
+    null,
+    2
+  )}`;
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model,
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "system",
+          content: "You are a concise SAT Math coach. Return only valid JSON.",
+        },
+        { role: "user", content: prompt },
+      ],
+    });
+
+    const raw = completion.choices[0]?.message?.content;
+    if (!raw) throw new Error("Empty model response");
+
+    const parsed = FeedbackResponseSchema.parse(JSON.parse(raw));
+    return res.json(parsed);
+  } catch (err) {
+    const safeError = getSafeErrorDetails(err);
+    console.error(`[sat-quiz-api] OpenAI feedback generation failed: ${safeError.message}`, {
+      status: safeError.status,
+      code: safeError.code,
+      type: safeError.type,
+    });
+    return res.status(500).json({ error: "AI feedback unavailable." });
   }
 });
 

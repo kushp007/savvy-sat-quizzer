@@ -5,6 +5,7 @@ import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Brain, Clock, Target, ArrowRight, RotateCcw, Info, TrendingUp } from "lucide-react";
+import katex from "katex";
 import QuizResults from "@/components/QuizResults";
 import { useQuiz } from "@/hooks/useQuiz";
 import { TOTAL_QUIZ_QUESTIONS } from "@/lib/quizConstants";
@@ -14,6 +15,55 @@ interface QuizProps {
   playerName: string;
   onRestart: () => void;
 }
+
+const INLINE_MATH_PATTERN = /(\\frac\{[^}]+\}\{[^}]+\}|\\log_[0-9A-Za-z]+\([^)]*\)|[0-9A-Za-z]+\^[0-9A-Za-z]+)/g;
+const DELIMITED_MATH_PATTERN = /(\$\$[\s\S]+?\$\$|\$[^$]+\$)/g;
+const INLINE_MATH_EXACT_PATTERN =
+  /^(\\frac\{[^}]+\}\{[^}]+\}|\\log_[0-9A-Za-z]+\([^)]*\)|[0-9A-Za-z]+\^[0-9A-Za-z]+)$/;
+
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+const renderMath = (expr: string, displayMode = false) =>
+  katex.renderToString(expr, {
+    throwOnError: false,
+    displayMode,
+  });
+
+const renderMathTextToHtml = (text: string): string => {
+  const delimitedChunks = text.split(DELIMITED_MATH_PATTERN).filter(Boolean);
+
+  return delimitedChunks
+    .map((chunk) => {
+      if (chunk.startsWith("$$") && chunk.endsWith("$$")) {
+        return renderMath(chunk.slice(2, -2).trim(), true);
+      }
+
+      if (chunk.startsWith("$") && chunk.endsWith("$")) {
+        return renderMath(chunk.slice(1, -1).trim(), false);
+      }
+
+      const inlineChunks = chunk.split(INLINE_MATH_PATTERN).filter(Boolean);
+      return inlineChunks
+        .map((inlineChunk) => {
+          if (INLINE_MATH_EXACT_PATTERN.test(inlineChunk)) {
+            return renderMath(inlineChunk, false);
+          }
+          return escapeHtml(inlineChunk);
+        })
+        .join("");
+    })
+    .join("");
+};
+
+const MathText: React.FC<{ text: string; className?: string }> = ({ text, className }) => (
+  <span className={className} dangerouslySetInnerHTML={{ __html: renderMathTextToHtml(text) }} />
+);
 
 const Quiz: React.FC<QuizProps> = ({ playerName, onRestart }) => {
   const {
@@ -171,7 +221,9 @@ const Quiz: React.FC<QuizProps> = ({ playerName, onRestart }) => {
               ) : (
                 <div>
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
-                    <span className="flex-1">{currentQuestion?.question}</span>
+                    <span className="flex-1">
+                      {currentQuestion?.question ? <MathText text={currentQuestion.question} /> : null}
+                    </span>
                     {currentQuestion && (
                       <span className="text-sm bg-gray-100 px-2 py-1 rounded text-gray-600 whitespace-nowrap">
                         {currentQuestion.subtopic}
@@ -210,14 +262,16 @@ const Quiz: React.FC<QuizProps> = ({ playerName, onRestart }) => {
                     }`}
                   >
                     <span className="font-medium mr-3">{String.fromCharCode(65 + index)}.</span>
-                    {option}
+                    <MathText text={option} />
                   </button>
                 ))}
 
                 {showResult && (
                   <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
                     <h4 className="font-semibold text-blue-800 mb-2">Explanation</h4>
-                    <p className="text-blue-700">{currentQuestion.explanation}</p>
+                    <p className="text-blue-700">
+                      <MathText text={currentQuestion.explanation} />
+                    </p>
                   </div>
                 )}
 
