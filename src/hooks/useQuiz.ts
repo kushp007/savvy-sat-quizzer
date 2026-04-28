@@ -14,6 +14,8 @@ const NEUTRAL_ACCURACY = 0.55;
 
 export interface UseQuizResult {
   poolLoading: boolean;
+  quizStatus: "preparing" | "active";
+  isPreparingQuiz: boolean;
   /** Only set when the API reports a real failure (not “no server / no key”). */
   aiErrorNotice: string | null;
   currentQuestion: SatQuestion | null;
@@ -36,6 +38,7 @@ export interface UseQuizResult {
 
 export function useQuiz(): UseQuizResult {
   const [poolLoading, setPoolLoading] = useState(true);
+  const [quizStatus, setQuizStatus] = useState<"preparing" | "active">("preparing");
   const [aiErrorNotice, setAiErrorNotice] = useState<string | null>(null);
   const [questionLoading, setQuestionLoading] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState<SatQuestion | null>(null);
@@ -51,6 +54,8 @@ export function useQuiz(): UseQuizResult {
   const usedKeysRef = useRef<Set<string>>(new Set());
   const scoreRef = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
+
+  const isPreparingQuiz = quizStatus === "preparing";
 
   const pickQuestionForIndex = useCallback((nextIndex: number, scoreNow: number) => {
     scoreRef.current = scoreNow;
@@ -73,44 +78,79 @@ export function useQuiz(): UseQuizResult {
     setCurrentQuestion(picked);
   }, []);
 
+  const initializeQuiz = useCallback(async (signal: AbortSignal) => {
+    setQuizStatus("preparing");
+    setPoolLoading(true);
+    setQuestionLoading(false);
+    setAiErrorNotice(null);
+    setCurrentQuestion(null);
+    setCurrentQuestionIndex(0);
+    setSelectedAnswer(null);
+    setScore(0);
+    setShowResult(false);
+    setQuizComplete(false);
+    setAnswers([]);
+    setTotalTimeLeft(QUIZ_TIME_LIMIT_SEC);
+    poolRef.current = [];
+    usedKeysRef.current.clear();
+    scoreRef.current = 0;
+
+    const { pool, ai } = await buildHybridQuestionPool({ signal });
+    if (signal.aborted) return;
+
+    poolRef.current = cloneShuffle(pool);
+
+    if (ai.kind === "merged" && ai.added > 0) {
+      toast.success(`Added ${ai.added} AI-generated questions to the pool.`);
+    } else if (ai.kind === "error") {
+      setAiErrorNotice(ai.message);
+      toast.error("Could not add AI questions", { description: ai.message });
+    }
+
+    setPoolLoading(false);
+    setQuestionLoading(true);
+    pickQuestionForIndex(0, 0);
+    setTotalTimeLeft(QUIZ_TIME_LIMIT_SEC);
+    setQuizStatus("active");
+    setQuestionLoading(false);
+  }, [pickQuestionForIndex]);
+
   useEffect(() => {
     abortRef.current = new AbortController();
     const { signal } = abortRef.current;
 
-    (async () => {
-      setPoolLoading(true);
-      setAiErrorNotice(null);
-      const { pool, ai } = await buildHybridQuestionPool({ signal });
-      if (signal.aborted) return;
-
-      poolRef.current = cloneShuffle(pool);
-
-      if (ai.kind === "merged" && ai.added > 0) {
-        toast.success(`Added ${ai.added} AI-generated questions to the pool.`);
-      } else if (ai.kind === "error") {
-        setAiErrorNotice(ai.message);
-        toast.error("Could not add AI questions", { description: ai.message });
-      }
-
-      setPoolLoading(false);
-      setQuestionLoading(true);
-      pickQuestionForIndex(0, 0);
-      setQuestionLoading(false);
-    })().catch(() => {
+    initializeQuiz(signal).catch(() => {
       setPoolLoading(false);
     });
 
     return () => abortRef.current?.abort();
-  }, [pickQuestionForIndex]);
+  }, [initializeQuiz]);
 
   useEffect(() => {
-    if (totalTimeLeft > 0 && !quizComplete) {
+    const shouldRunTimer =
+      quizStatus === "active" &&
+      currentQuestion !== null &&
+      !isPreparingQuiz &&
+      totalTimeLeft > 0 &&
+      !quizComplete;
+
+    if (shouldRunTimer) {
       const t = setTimeout(() => setTotalTimeLeft((s) => s - 1), 1000);
       return () => clearTimeout(t);
     }
-    if (totalTimeLeft === 0 && !quizComplete) setQuizComplete(true);
+
+    if (
+      quizStatus === "active" &&
+      currentQuestion !== null &&
+      !isPreparingQuiz &&
+      totalTimeLeft === 0 &&
+      !quizComplete
+    ) {
+      setQuizComplete(true);
+    }
+
     return undefined;
-  }, [totalTimeLeft, quizComplete]);
+  }, [currentQuestion, isPreparingQuiz, quizComplete, quizStatus, totalTimeLeft]);
 
   const submitAnswer = useCallback(() => {
     if (selectedAnswer === null || !currentQuestion) return;
@@ -167,6 +207,8 @@ export function useQuiz(): UseQuizResult {
 
   return {
     poolLoading,
+    quizStatus,
+    isPreparingQuiz,
     aiErrorNotice,
     currentQuestion,
     currentQuestionIndex,

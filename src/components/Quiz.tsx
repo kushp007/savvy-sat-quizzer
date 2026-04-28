@@ -68,6 +68,8 @@ const MathText: React.FC<{ text: string; className?: string }> = ({ text, classN
 const Quiz: React.FC<QuizProps> = ({ playerName, onRestart }) => {
   const {
     poolLoading,
+    quizStatus,
+    isPreparingQuiz,
     aiErrorNotice,
     currentQuestion,
     currentQuestionIndex,
@@ -86,7 +88,10 @@ const Quiz: React.FC<QuizProps> = ({ playerName, onRestart }) => {
   } = useQuiz();
 
   const isBusy = poolLoading || questionLoading;
-  const progress = ((currentQuestionIndex + 1) / TOTAL_QUIZ_QUESTIONS) * 100;
+  const hasActiveQuestion = quizStatus === "active" && currentQuestion && !isPreparingQuiz;
+  const progress = hasActiveQuestion
+    ? ((currentQuestionIndex + 1) / TOTAL_QUIZ_QUESTIONS) * 100
+    : 0;
 
   const formatTime = (seconds: number) => {
     const minutes = Math.floor(seconds / 60);
@@ -131,7 +136,9 @@ const Quiz: React.FC<QuizProps> = ({ playerName, onRestart }) => {
           <div>
             <h1 className="text-2xl font-bold text-gray-800">Hi, {playerName}!</h1>
             <p className="text-gray-600">
-              Question {currentQuestionIndex + 1} of {TOTAL_QUIZ_QUESTIONS}
+              {hasActiveQuestion
+                ? `Question ${currentQuestionIndex + 1} of ${TOTAL_QUIZ_QUESTIONS}`
+                : "Preparing question pool..."}
             </p>
           </div>
           <Button variant="outline" onClick={onRestart} className="flex items-center gap-2">
@@ -161,13 +168,13 @@ const Quiz: React.FC<QuizProps> = ({ playerName, onRestart }) => {
                 <div>
                   <p className="text-sm text-gray-600">This question</p>
                   <div className="flex flex-wrap gap-1 items-center">
-                    {currentQuestion && (
+                    {hasActiveQuestion && (
                       <Badge variant="secondary" className="capitalize">
                         {currentQuestion.difficulty}
                       </Badge>
                     )}
                     <span className={`text-sm font-semibold capitalize ${diffColor}`}>
-                      {currentQuestion?.topic ?? "—"}
+                      {hasActiveQuestion ? currentQuestion?.topic ?? "—" : "—"}
                     </span>
                   </div>
                 </div>
@@ -222,9 +229,11 @@ const Quiz: React.FC<QuizProps> = ({ playerName, onRestart }) => {
                 <div>
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
                     <span className="flex-1">
-                      {currentQuestion?.question ? <MathText text={currentQuestion.question} /> : null}
+                      {hasActiveQuestion && currentQuestion?.question ? (
+                        <MathText text={currentQuestion.question} />
+                      ) : null}
                     </span>
-                    {currentQuestion && (
+                    {hasActiveQuestion && currentQuestion && (
                       <span className="text-sm bg-gray-100 px-2 py-1 rounded text-gray-600 whitespace-nowrap">
                         {currentQuestion.subtopic}
                       </span>
