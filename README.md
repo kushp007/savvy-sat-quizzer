@@ -132,7 +132,7 @@ server/
 └── db/             # MongoDB scaffold
 
 public/
-├── favicon.jpg
+├── favicon.png
 └── assets/
 
 .env                # Environment variables (never commit this)

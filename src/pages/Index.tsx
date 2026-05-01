@@ -53,7 +53,7 @@ const Index = () => {
               <BookOpen className="w-12 h-12 text-indigo-500 mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">Hybrid question pool</h3>
               <p className="text-gray-600">
-                Built-in problems plus optional server-generated batches — keys never ship to the browser
+                Uses both built-in and AI-generated questions to give you more variety as you practice.
               </p>
             </CardContent>
           </Card>
