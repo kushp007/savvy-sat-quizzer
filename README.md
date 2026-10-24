@@ -6,8 +6,7 @@ An AI-powered adaptive SAT Math practice platform that simulates real exam condi
 
 ## Live Demo
 
-https://your-app-link.vercel.app
-
+https://savvy-sat-quizzer.vercel.app/
 ---
 
 ## Features
